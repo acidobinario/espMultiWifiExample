@@ -171,6 +171,7 @@ void setup() {
      WiFi.begin(readSsidAtIndex(0), readPskAtIndex(0)); // stay on WiFi[0] if we don't have any other wifi network to test
   }
   
+  internetQualityMillis = millis();
 }
 
 void loop() {

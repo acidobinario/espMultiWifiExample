@@ -194,58 +194,7 @@ if (!SPIFFS.exists("/settings.json")) //check if settings exists
     File settings = SPIFFS.open("/settings.json", "w"); // open the file in write mode (this will create it)
     WriteStartingConfigFile(settings); // save the starting configuration
     settings.close(); //close the file
-}currentTime = millis(); //get the millis!
-    
-    
-    if(checkInternetQuality){
-        // start the InternetQuality Testing!
-        
-        if((currentTime - internetQualityMillis) > (120000 * 2)){
-            // if >four minutes has passed
-            checkInternetQuality = false; // we do not need to keep checking all of this
-            if(!secondWiFiPassed){// IDK if this is really necessary, but whatever
-                secondWiFiPassed = true;
-                if(errorCount > 2){
-                    secondWiFiOk = false;
-                } else {
-                    secondWiFiOk = true;
-                }
-            }
-            
-            if(firstWiFiOk){
-                WiFi.begin(readSsidAtIndex(1), readPskAtIndex(1));
-            } else {
-                if (secondWiFiOk){
-                    WiFi.begin(readSsidAtIndex(0), readPskAtIndex(0));
-                } else {
-                    ESP.reset();
-                }
-            }
-        } else if ((currentTime - internetQualityMillis) > 120000){
-            // if >two minutes has passed
-            if (!firstWiFiPassed){
-                firstWiFiPassed = true; //do this only once
-                WiFi.begin(readSsidAtIndex(0), readPskAtIndex(0)); // connect to the second wifi at index 1
-                if(errorCount > 0){
-                    firstWiFiOk = false;
-                }else{
-                    firstWiFiOk = true;
-                }
-                
-            }
-        }
-    }
-    
-    
-    if(currentTime - previousRequestMillis > 30000){
-        // do a request and check if it was successful
-        err = sendRequest();
-        if(err){
-            httpErrorCount++;
-        } else {
-            httpErrorCount = 0;
-        }
-    }
+}
 ```
 
 After we checked the existence of the settings.json file, we can read the file and parse its contents to a json object
@@ -304,7 +253,6 @@ That would look something like this:
 unsigned long currentTime = 0; // to store the current millis 
 unsigned long internetQualityMillis = 0; // to store the millis from 
 unsigned long previousRequestMillis = 0;
-
 int httpErrorCount = 0;
 
 // booleans to know when the time of the test has completed
@@ -315,19 +263,23 @@ bool secondWiFiPassed = false;
 bool firstWiFiOk = false;
 bool secondWiFiOk = false;
 
-void loop(){
-    currentTime = millis(); //get the millis!
+bool checkInternetQuality = false;
+
+void loop() {
+  // put your main code here, to run repeatedly:
+
+  currentTime = millis(); //get the millis!
     
     
     if(checkInternetQuality){
         // start the InternetQuality Testing!
         
-        if((currentTIme - internetQualityMillis) > (120000 * 2)){
+        if((currentTime - internetQualityMillis) > (120000 * 2)){
             // if >four minutes has passed
             checkInternetQuality = false; // we do not need to keep checking all of this
             if(!secondWiFiPassed){// IDK if this is really necessary, but whatever
                 secondWiFiPassed = true;
-                if(errorCount > 2){
+                if(httpErrorCount > 2){
                     secondWiFiOk = false;
                 } else {
                     secondWiFiOk = true;
@@ -348,7 +300,7 @@ void loop(){
             if (!firstWiFiPassed){
                 firstWiFiPassed = true; //do this only once
                 WiFi.begin(readSsidAtIndex(0), readPskAtIndex(0)); // connect to the second wifi at index 1
-                if(errorCount > 0){
+                if(httpErrorCount > 0){
                     firstWiFiOk = false;
                 }else{
                     firstWiFiOk = true;
@@ -361,14 +313,13 @@ void loop(){
     
     if(currentTime - previousRequestMillis > 30000){
         // do a request and check if it was successful
-        err = sendRequest();
+        bool err = sendRequest();
         if(err){
             httpErrorCount++;
         } else {
             httpErrorCount = 0;
         }
     }
-    
 }
 ```
 
