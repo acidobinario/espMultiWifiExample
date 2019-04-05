@@ -194,7 +194,58 @@ if (!SPIFFS.exists("/settings.json")) //check if settings exists
     File settings = SPIFFS.open("/settings.json", "w"); // open the file in write mode (this will create it)
     WriteStartingConfigFile(settings); // save the starting configuration
     settings.close(); //close the file
-}
+}currentTime = millis(); //get the millis!
+    
+    
+    if(checkInternetQuality){
+        // start the InternetQuality Testing!
+        
+        if((currentTime - internetQualityMillis) > (120000 * 2)){
+            // if >four minutes has passed
+            checkInternetQuality = false; // we do not need to keep checking all of this
+            if(!secondWiFiPassed){// IDK if this is really necessary, but whatever
+                secondWiFiPassed = true;
+                if(errorCount > 2){
+                    secondWiFiOk = false;
+                } else {
+                    secondWiFiOk = true;
+                }
+            }
+            
+            if(firstWiFiOk){
+                WiFi.begin(readSsidAtIndex(1), readPskAtIndex(1));
+            } else {
+                if (secondWiFiOk){
+                    WiFi.begin(readSsidAtIndex(0), readPskAtIndex(0));
+                } else {
+                    ESP.reset();
+                }
+            }
+        } else if ((currentTime - internetQualityMillis) > 120000){
+            // if >two minutes has passed
+            if (!firstWiFiPassed){
+                firstWiFiPassed = true; //do this only once
+                WiFi.begin(readSsidAtIndex(0), readPskAtIndex(0)); // connect to the second wifi at index 1
+                if(errorCount > 0){
+                    firstWiFiOk = false;
+                }else{
+                    firstWiFiOk = true;
+                }
+                
+            }
+        }
+    }
+    
+    
+    if(currentTime - previousRequestMillis > 30000){
+        // do a request and check if it was successful
+        err = sendRequest();
+        if(err){
+            httpErrorCount++;
+        } else {
+            httpErrorCount = 0;
+        }
+    }
 ```
 
 After we checked the existence of the settings.json file, we can read the file and parse its contents to a json object
@@ -262,7 +313,7 @@ bool secondWiFiPassed = false;
 
 // booleans to store the final network quality
 bool firstWiFiOk = false;
-bool secondWiFiOk = false
+bool secondWiFiOk = false;
 
 void loop(){
     currentTime = millis(); //get the millis!
