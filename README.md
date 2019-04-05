@@ -5,7 +5,7 @@ So.. I was working on an IoT project that needed two possible WiFi connections, 
 The quickest and easiest way to handle the user configurable WiFi credential is to use the WiFiManager library for the ESP8266 and the ESP8266HTTPClient lib for the HTTP requests.
 
 <a href="https://github.com/tzapu/WiFiManager/tree/master/examples/OnDemandConfigPortal" target="_blank" >[WiFiManager code]</a>
-```arduino
+```c++
 #include Arduino.h
 #include <ESP8266WiFi.h>          //https://github.com/esp8266/Arduino
 
@@ -77,7 +77,7 @@ the WiFi object array has one "hard coded" (`WiFi[0]`) credential and the other 
 ## Using the Arduino_JSON library
 How do we make that structure? easy, just follow the <a href="https://github.com/arduino-libraries/Arduino_JSON/tree/master/examples" target="_blank" >examples</a>!
 
-```Arduino
+```c++
 void createStartingJsonStruct(File settings) {
     // Declare the JSON object to use
     JSONVar root;    // main json root object
@@ -95,7 +95,7 @@ this function receives a settings file (in write mode!) and then proceeds to cre
 
 How do we use this function?
 
-```Arduino
+```c++
  File settings = SPIFFS.open("/settings.json", "w"); //open the file in write mode
  WriteStartingConfigFile(settings); // write the starting config json
  settings.close(); // close the file
@@ -103,7 +103,7 @@ How do we use this function?
 
 And we also need a function to save/change the custom wifi credential
 
-```Arduino
+```c++
 //TODO: complete this!
 void SaveCustomWifi(String ssid, String psk)
 {
@@ -131,7 +131,7 @@ Now we can save the user wifi network with `SaveCustomWifi(ssid, psk);`:D
 
 All nice, but how do we retrieve the data?
 
-```Arduino
+```c++
 String readSsidAtIndex(int ind) // read "ssid" from the array at index ind
 {
   File settings = SPIFFS.open("/settings.json", "r"); // open the file
@@ -152,7 +152,7 @@ String readSsidAtIndex(int ind) // read "ssid" from the array at index ind
 }
 ```
 and the same with the pass phrase key
-```Arduino
+```c++
 String readPskAtIndex(int ind) // read "psk" from the array at index ind
 {
   File settings = SPIFFS.open("/settings.json", "r"); // open the file
@@ -183,7 +183,7 @@ Now with these functions, we can start doing some stuff.
 
 We can check if the file settings.json exists with this if statement
 
-```arduino
+```c++
 if (!SPIFFS.exists("/settings.json"))
 ```
 
@@ -250,7 +250,7 @@ if (!SPIFFS.exists("/settings.json")) //check if settings exists
 
 After we checked the existence of the settings.json file, we can read the file and parse its contents to a json object
 
-```arduino
+```c++
   File settingsRead = SPIFFS.open("/settings.json", "r"); //open file in read mode
   String jsonstr;                                         //store its contents...
   while (settingsRead.available())
@@ -265,7 +265,7 @@ After we checked the existence of the settings.json file, we can read the file a
 
 then we can decide depending on the length of the WiFi array if we make a check the Internet quality (sending requests) or if we should only stick to the hard-coded wifi credentials.
 
-```arduino
+```c++
 if (myObject["WiFi"].length() == 1) //if there's only one wifi cred..
   {
     if (!(WiFi.SSID() == readSsidAtIndex(0) && WiFi.psk() == readPskAtIndex(0))) // check if the current wifi connection isn't the WiFi[0] (modem)
@@ -300,7 +300,7 @@ I'm going to test the quality by connecting to the network and reporting the dev
 
 That would look something like this:
 
-```arduino
+```c++
 unsigned long currentTime = 0; // to store the current millis 
 unsigned long internetQualityMillis = 0; // to store the millis from 
 unsigned long previousRequestMillis = 0;
