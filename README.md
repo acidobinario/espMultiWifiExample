@@ -50,7 +50,7 @@ But... How?
 
 Using <a href="https://arduino-esp8266.readthedocs.io/en/latest/filesystem.html" target="_blank" >SPIFFS</a> and <a href="https://github.com/arduino-libraries/Arduino_JSON" target="_blank" >Arduino_JSON</a> to store the users WiFi configurations!
 
-> This approach can also work as a save other configuration variables that can be useful for the code.
+> This approach can also work to save other configuration variables that can be useful for the code.
 
 Both libraries have nice documentation, I recommend you to RTFM and explore the examples, but I will try my best to explain the code.
 
@@ -245,7 +245,8 @@ Now that we have the logic that tells us if we want to check the internet qualit
 
 To do this, we can have two booleans `firstWiFiOk` and `secondWiFiOk` to store the final quality for the wifi network.
 
-I'm going to test the quality by connecting to the network and reporting the device to my server every 30s and for each HTTP error adding 1 to an error counter (`httpErrorCount`), after 2 minutes, switching to the other wifi network and doing the same, if the first wifi network has less than 2 errors, I can say it's a good network and connect to it, and if it has more than 2 errors, I will see if the second wifi network (WiFi[0]) has less than 2 errors I connect to it, but if it has more than 2 errors, then I'll reset the esp.
+I'm going to test the Internet quality of each WiFi network by connecting to the network and reporting the device to my server every 30s and for each HTTP error increasing an error counter (`httpErrorCount`), 
+after 2 minutes, switching to the other wifi network and doing the same, if the first wifi network (WiFi[1]) has less than 2 errors, I can say it's a good network and connect to it, and if it has more than 2 errors, I will see if the second wifi network (WiFi[0]) has less than 2 errors I connect to it, but if it has more than 2 errors, then I'll reset the esp.
 
 That would look something like this:
 
