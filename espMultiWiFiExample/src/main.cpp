@@ -178,17 +178,19 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-  currentTime = millis(); //get the millis!
+    currentTime = millis(); //get the millis!
   
-  if(digitalRead(TRIGGER_PIN) == LOW){
+    if(digitalRead(TRIGGER_PIN) == LOW){
         WiFiManager wifiManager;
         if (!wifiManager.startConfigPortal("OnDemandAP")) {
-          delay(3000);
-          //reset and try again, or maybe put it to deep sleep
-          ESP.reset();
-          delay(5000);
+            delay(3000);
+            //reset and try again, or maybe put it to deep sleep
+            ESP.reset();
+            delay(5000);
+        } else {
+            ESP.reset();
         }
-  }
+    }
     
     if(checkInternetQuality){
         // start the InternetQuality Testing!
