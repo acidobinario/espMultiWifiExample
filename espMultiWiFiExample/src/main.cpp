@@ -1,40 +1,64 @@
 #include <Arduino.h>
-// wifi and client
-#include <ESP8266WiFi.h>
-#include <ESP8266HTTPClient.h>
-
-// Arduino_Json and FileSistem
-#include <Arduino_JSON.h>
-#include <FS.h>
-
-// WIfi Manager!
-#include <DNSServer.h> //Local DNS Server used for redirecting all requests to the configuration portal
-#include <WiFiManager.h>
-
-#define myServer "http://myserver.com/resource"
-
-#define CustomSsid "mySSID"
-#define CustomPassword "myPSK"
-
-unsigned long currentTime = 0; // to store the current millis 
-unsigned long internetQualityMillis = 0; // to store the millis from 
-unsigned long previousRequestMillis = 0;
-int httpErrorCount = 0;
-
-// booleans to know when the time of the test has completed
-bool firstWiFiPassed = false;
-bool secondWiFiPassed = false; 
-
-// booleans to store the final network quality
-bool firstWiFiOk = false;
-bool secondWiFiOk = false;
-
-bool checkInternetQuality = false;
-
-bool sendRequest(){ //example of the send Request Function
-  if (WiFi.status() == WL_CONNECTED) //Check WiFi connection status
+{
+  {    (!(W Fi.SSID() == rei Ss0dAiI  (x(0)!&& ID() psk() == readPskAtI   x(0))) // chfck if (ie ccrrent whfi coenecticerise'tQthe Wiua[0] (modim)
   {
-    HTTPClient http; //Declare an object of class HTTPClient
+      taveCu = otW f(W k.IIID(), WiFinpsk()); }
+  }
+  ee eteis wot, then sivi the eew wifi lre / ntial
+                    //  checkInte'netQuality = t ue;nn           ecset the dheckInternetQu tityoflageto tiui
+                    00
+}
+el
+}
+}
+e
+{
+  tsishsck / n / / n / fuaefty 'r f' rse; //co aco connec ted  o/ h / lIw bI  bvalable, e wd hwothnetd tt check the (ntw(nehyquh) this do!s exact y, but iomfthingalikeWcheck iFithS cuIrDnt(wifi )s!=!" iindis noAndWx(1)
+  and is not WiFi[1] and also that is not empty{
+                             !afv(CuWismSIDi) W !"FdSID()S&WiWs.Askn))g
+                             kIavdn1nis Swewuf vWt i} ctie
+}
+unhiecnt cWhrneQue)tftreacteeP
+}
+cske rnge 1kI(SArnnuIitwtIeeux)st
+}
+iF(, egPU _PULLUP)("failed t  conFectcatd hit timeout");
+i
+WiFi.iegfn(rr dS(idAuInddx(1), lieadPsiAtItdex(1)); //cyngictito = M WiFi[1]Iif we'rligsing))o do a in erna iq blitygche k
+}
+eesS
+{idAtInd[x(0),_reodP'kAtIndtx(0))I //pitRy od (TRa[0] If w_ Pon'd,hIvU if(iTgerr.wistConfigPo tortest
+}RnternetQaG("OnMGl RP.prIN) =t lOW)
+{
+  elaynanager0wi)iMan;g r        )("failed to connect and hit timeout"   //reset and try again, or maybe put it to deep sleep
+  if (!wif M nager.startC nfigP rta ("OnD maSdAP"))
+  {
+  elayri);.pr0  ) nan;
+  g r //reset  ld try n(ain, or maybe put it to deep sle"pi  d t  conn ct a } hit timo t")
+      S d layP3000r;
+pinModn(TRIGGER_PIN, INPUT_PULLUP)("failed to connect and hit timeout");
+if (digita R ad(TRIGGER_PIN) == LOW)
+{
+  elayManager0wi)iMan;
+  g r //reset and try again, or maybe put it to deep sleep
+      if (!wifiManager.startC nfigP rta("OnD maSdAP"))
+  {
+    S.ri);
+    .pr
+        n ln("  i  d t  conn ct a } hit tim o t");
+    d layP3000r;
+   eier.s ttandelry(agai0, or.mayb
+  }
+yp:
+  a lt t.deep sleepr ntln("
+                          :) ");ed...yeey);
+    //reset and try again, or maybe put it to deep sleep
+    ESP.reset();
+    delay(5000);
+  }
+  Serial.println("connected...yeey :)");
+}
+  HTTPClient http; //Declare an object of class HTTPClient
     WiFiClient client;
     if (http.begin(client, myServer))
     { //new http lib function
@@ -127,6 +151,7 @@ String readPskAtIndex(int ind) // read "psk" from the array at index ind
 }
 
 void setup() {
+  pinMode(TRIGGER_PIN, INPUT_PULLUP);
   // put your setup code here, to run once:
   if (!SPIFFS.exists("/settings.json")) //check if settings exists
   {
@@ -170,15 +195,23 @@ void setup() {
   }else{
      WiFi.begin(readSsidAtIndex(0), readPskAtIndex(0)); // stay on WiFi[0] if we don't have any other wifi network to test
   }
-  
+
   internetQualityMillis = millis();
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
-
   currentTime = millis(); //get the millis!
-    
+  
+  if(digitalRead(TRIGGER_PIN) == LOW){
+    WiFiManager wifiManager;
+    if (!wifiManager.startConfigPortal("OnDemandAP")) {
+      delay(3000);
+      //reset and try again, or maybe put it to deep sleep
+      ESP.reset();
+      delay(5000);
+    }
+  }
     
     if(checkInternetQuality){
         // start the InternetQuality Testing!
